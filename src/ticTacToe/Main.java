@@ -2,9 +2,12 @@ package ticTacToe;
 
 import java.util.*;
 
+//this class constitutes the actual gameplay
+//it handles user inputs and determines if there's a win
 public class Main {
 	
-    static String[][] field = new String[3][3];
+    static Field field = new Field();
+    static Computer computerPlayer = new Computer(field);
     static Scanner scanner = new Scanner(System.in);
     static int numberOfOs = 0;
     static int numberOfXs = 0;
@@ -35,61 +38,34 @@ public class Main {
     static WhosTurn whosTurn = WhosTurn.XTURN;
 
     public static void main(String[] args) {
-
-        String input = scanner.nextLine();
-
-        parseInput(input);
-        printField();
-        getCoordinates();
-        getGameState();
+       
+        field.printField();
+        
+        while(gameState == GameState.UNFINISHED) {
+        	userTurn();
+        	if(gameState == GameState.UNFINISHED) {
+        	computerTurn();
+        	}
+        }
+        
+        
+        //getGameState();
         //printField();
 
     }
-
-    /* converts line of symbols into 3x3 board
-    also counts number of each piece to determine who's turn it is
-    and game status
-    */
-    public static void parseInput(String input){
-        int i = 0;
-        for(int y = 0; y < 3; y++){
-            for(int x = 0; x < 3; x++){
-                field[x][y] = Character.toString(input.charAt(i));
-                if(field[x][y].equals("X")){
-                    numberOfXs++;
-                } else if(field[x][y].equals("O")){
-                    numberOfOs++;
-                } else if (field[x][y].equals("_")){
-                    numberEmpty++;
-                }
-                i++;
-            }
-        }
+    
+    public static void userTurn() {
+    	getCoordinates();
+    	// getGameState();
+    	field.printField();
+    	whosTurn = WhosTurn.YTURN;
     }
-
-    //displays state of current field
-    //called at beginning and following every move
-    public static void printField(){
-        //upper border
-        System.out.println("---------");
-
-        for(int y = 0; y < 3; y++){
-            //left border
-            System.out.print("| ");
-
-            for(int x = 0; x < 3; x++){
-                //handles blank spaces
-                if(field[x][y].equals("_")){
-                    System.out.print("  ");
-                } else {
-                    System.out.print(field[x][y] + " ");
-                }
-            }
-            //right border
-            System.out.println("|");
-        }
-        //lower border
-        System.out.println("---------");
+    
+    public static void computerTurn() {
+    	computerPlayer.makeEasyMove();
+    	field.printField();
+    	setGameState();
+    	whosTurn = WhosTurn.XTURN;
     }
 
     //asks for user input and responds to common errors
@@ -149,12 +125,12 @@ public class Main {
     private static boolean checkValidCoordinates(int x, int y){
         if(x > 3 || x < 1 || y < 1 || y > 3) {
             System.out.println("Coordinates should be from 1 to 3!");
-            System.out.println("x = " + x + "y = " + y);
+            // System.out.println("x = " + x + "y = " + y);
             return false;
         }
         y = translateInputCoord(y);
         x = x - 1;
-        if (!field[x][y].equals("_")){
+        if (!field.getCell(x, y).equals("_")){
             System.out.println("This cell is occupied! Choose another one!");
             return false;
         } else {
@@ -166,62 +142,40 @@ public class Main {
     // only called when checkValidCoordinates determines legal move
     // places user's move on board according to who's turn it is
     //prints field as it stands following added move
+    // determines if move changed the state of the game
     private static void placeMove(int x, int y){
-        if(getWhosTurn() == WhosTurn.XTURN){
-            field[x][y] = "X";
-        } else {
-            field[x][y] = "0";
-        }
-        printField();
+       
+            field.setCell(x, y, "X");
+       
+        // field.printField();
         setGameState();
     }
 
     //determines whether to place an X or an 0 based on
-    //number of each currently on board
-    //returns findings to placeMove
+    //who moved last
     public static WhosTurn getWhosTurn(){
-        tallyCells();
-        if(numberOfOs == numberOfXs){
-            whosTurn = WhosTurn.XTURN;
-            return whosTurn;
-        } else if (numberOfXs > numberOfOs) {
-            whosTurn = WhosTurn.YTURN;
-            return whosTurn;
+       
+        if(whosTurn == WhosTurn.XTURN) {
+        	whosTurn = WhosTurn.YTURN;
+        } else {
+        	whosTurn = WhosTurn.XTURN;
         }
         return whosTurn;
     }
 
-    //counts number of X's, Os, and empty cells
-    //to determine who's next and game state
-    public static void tallyCells(){
-        numberOfXs = 0;
-        numberOfOs = 0;
-        numberEmpty = 0;
-        for(int y = 0; y < 3; y++){
-            for(int x = 0; x < 3; x++){
-
-                if(field[x][y].equals("X")){
-                    numberOfXs++;
-                } else if(field[x][y].equals("O")){
-                    numberOfOs++;
-                } else if (field[x][y].equals("_")){
-                    numberEmpty++;
-                }
-
-            }
-        }
-    }
 
     public static void setGameState(){
-        tallyCells();
-        if(checkWins("X")) {
+        field.tallyCells();
+        if(field.checkWins("X")) {
             gameState = GameState.XWIN;
-        } else if(checkWins("O")){
+            System.out.println("X wins");
+        } else if(field.checkWins("O")){
             gameState = GameState.OWIN;
-        } else if (numberEmpty == 0){
+            System.out.println("O wins");
+        } else if (field.getXs() + field.getOs() == 9){
             gameState = GameState.DRAW;
+            System.out.println("Draw");
         } else {
-
             gameState = GameState.UNFINISHED;
         }
     }
@@ -229,43 +183,11 @@ public class Main {
     public static void getGameState(){
         System.out.println(gameState.getMessage());
     }
+    
+    
 
-    public static boolean checkWins(String str){
-       
-        //checks for horizontal wins
-        for(int row = 0; row < 3; row++){
-            if(field[row][0].equals(str) &&
-                field[row][1].equals(str) &&
-                field[row][2].equals(str)){
-                
-                return true;
-            }
-        }
-        //checks for vertical wins
-        for(int col = 0; col < 3; col++){
-            if(field[0][col].equals(str) &&
-                    field[1][col].equals(str) &&
-                    field[2][col].equals(str)){
-                
-                return true;
-            }
-        }
-        //checks diagonal (top-R to B-L and top L to B-R)
-        if(field[0][0].equals(str) &&
-            field[1][1].equals(str) &&
-            field[2][2].equals(str)){
-           
-            return true;
-        }
-        if(field[0][2].equals(str) &&
-                field[1][1].equals(str) &&
-                field[2][0].equals(str)){
-       
-            return true;
-        }
-        return false;
-    }
-
+    
+    
 
 }
 
