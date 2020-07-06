@@ -1,8 +1,9 @@
 package ticTacToe;
 
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
+	
     static String[][] field = new String[3][3];
     static Scanner scanner = new Scanner(System.in);
     static int numberOfOs = 0;
