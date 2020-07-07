@@ -47,10 +47,7 @@ public class Main {
         	computerTurn();
         	}
         }
-        
-        
-        //getGameState();
-        //printField();
+      
 
     }
     
@@ -148,7 +145,7 @@ public class Main {
             field.setCell(x, y, "X");
        
         // field.printField();
-        setGameState();
+        //setGameState();
     }
 
     //determines whether to place an X or an 0 based on
