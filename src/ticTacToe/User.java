@@ -92,6 +92,7 @@ public class User extends Player{
     // determines if move changed the state of the game
     private void placeMove(int x, int y){
             field.setCell(x, y, this.getMarker());
+            field.printField();
             Main.setGameState();
     }
 
