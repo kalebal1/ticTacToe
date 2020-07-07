@@ -2,16 +2,17 @@ package ticTacToe;
 
 import java.util.*;
 
+import ticTacToe.Player.PlayerMarker;
+
 //this class constitutes the actual gameplay
 //it handles user inputs and determines if there's a win
 public class Main {
 	
     static Field field = new Field();
-    static Computer computerPlayer = new Computer(field);
+    // static Computer computerPlayer = new Computer(field);
+    static Player player1;
+    static Player player2;
     static Scanner scanner = new Scanner(System.in);
-    static int numberOfOs = 0;
-    static int numberOfXs = 0;
-    static int numberEmpty = 0;
     
     public enum GameState {
         UNFINISHED("Game not finished"),
@@ -31,135 +32,101 @@ public class Main {
     
     static GameState gameState = GameState.UNFINISHED;
 
-    //X always starts, but after that it's determined by number of each on board
-    public enum WhosTurn {
-        XTURN, YTURN
-    }
-    static WhosTurn whosTurn = WhosTurn.XTURN;
 
     public static void main(String[] args) {
        
-        field.printField();
+        // field.printField();
         
-        while(gameState == GameState.UNFINISHED) {
+        /* while(gameState == GameState.UNFINISHED) {
         	userTurn();
         	if(gameState == GameState.UNFINISHED) {
         	computerTurn();
         	}
         }
+        */
+        menu();
       
 
     }
     
-    public static void userTurn() {
-    	getCoordinates();
-    	// getGameState();
-    	field.printField();
-    	whosTurn = WhosTurn.YTURN;
+    //this method 
+    private static void menu() {
+    	System.out.println("Input command:");
+    	
+    	if(scanner.hasNext()) {
+    		try {
+    			String input = scanner.nextLine();
+    			String[] inputarr = input.split(" ");
+    			if(inputarr[0].equalsIgnoreCase("start")) {
+    				start(inputarr);
+    			} else if (inputarr[0].equalsIgnoreCase("exit")) {
+    				exit();
+    			} else {
+    				System.out.println("Bad parameters!");
+    				menu();
+    			}
+    		} catch (Exception e){
+    			System.out.println("Bad parameters!");
+    			menu();
+    		}
+    		
+    	} else {
+    		System.out.println("Bad parameters!");
+    	}
+    	
+    	
     }
     
-    public static void computerTurn() {
-    	computerPlayer.makeEasyMove();
-    	field.printField();
-    	setGameState();
-    	whosTurn = WhosTurn.XTURN;
+    //start game
+    //parameters: who will play 'x' and who will play 'o'
+    //acceptable arg values: 'user' or 'easy' (later add 'medium' and 'hard')
+    private static void start(String[] inputarr) {
+    	try {
+    		String player1 = inputarr[1];
+    		String player2 = inputarr[2];
+    		System.out.println(player1 + "<-p1  p2--> " + player2);
+    		determinePlayers(player1, player2);
+    	} catch (Exception e) {
+    		System.out.println("Bad parameters!" + " in start");
+    	}
+		
+    	while(gameState == GameState.UNFINISHED) {
+    		player1.makeMove();
+    		player2.makeMove();
+    	}
+    	menu();
+    	
+    	
+    	
     }
-
-    //asks for user input and responds to common errors
-    //user must input coordinates as two ints to continue
-    //after coordinates are determined, this method calls checkValidCoordinates
-    //if coordinates aren't valid, the cycle continues
-    public static void getCoordinates(){
-        System.out.println("Enter the coordinates:");
-        int x = -1;
-        int y = -1;
-        int inputX = -10;
-        int inputY = -10;
-
-        if(scanner.hasNext()) {
-            try {
-                inputX = Integer.parseInt(scanner.next());
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println("You should enter numbers!");
-                while(inputX == -10){
-                    try {
-                        inputX = Integer.parseInt(scanner.next());
-                    } catch (Exception ex) {
-                        scanner.nextLine();
-                        System.out.println("You should enter numbers!");
-                    }
-                }
-            }
-            try {
-                inputY = Integer.parseInt(scanner.next());
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println("You should enter numbers!");
-            }
-        }
-        x = inputX;
-        y = inputY;
-        if(!checkValidCoordinates(x, y)){
-            getCoordinates();
-        }
-
+    
+    //param: two string inputs from start()
+    //verifies input is either "user" or "easy" then implements players as either User or Computer
+    //player 1 is always X, 2 is always O
+    private static void determinePlayers(String p1, String p2) {
+    	
+    	if(!p1.equalsIgnoreCase("user") && !p1.equalsIgnoreCase("easy")) {
+    		System.out.println("Bad parameters!" +  " in detPl");
+    		System.out.println("p1 =" + p1);
+    		menu();
+    	} else if (!p2.equalsIgnoreCase("user") && !p2.equalsIgnoreCase("easy")) {
+    		System.out.println("Bad parameters!" +  " in detPl");
+    		System.out.println("p2 =" + p2);
+    		menu();
+    	}
+    	
+    	player1 = p1.equalsIgnoreCase("user") ? 
+    			new User(field, PlayerMarker.X) : new Computer(field, PlayerMarker.X, p1);
+    	player2 = p2.equalsIgnoreCase("user") ? 
+    			new User(field, PlayerMarker.O) : new Computer(field, PlayerMarker.O, p2);
+    	
     }
-
-    // adjusts user input coordinates to array values
-    // x coordinates remain the same
-    private static int translateInputCoord(int y){
-        int newy = y == 3 ? 0 : y == 2 ? 1 : 2;
-        return newy;
+    
+    //terminates the program
+    private static void exit() {
+    	
     }
-
-    /*
-    called by getCoordinates
-    param: user input for next move
-    prints error message if coordinates are not valid
-    otherwise, sends coordinates to placeMove
-     */
-    private static boolean checkValidCoordinates(int x, int y){
-        if(x > 3 || x < 1 || y < 1 || y > 3) {
-            System.out.println("Coordinates should be from 1 to 3!");
-            // System.out.println("x = " + x + "y = " + y);
-            return false;
-        }
-        y = translateInputCoord(y);
-        x = x - 1;
-        if (!field.getCell(x, y).equals("_")){
-            System.out.println("This cell is occupied! Choose another one!");
-            return false;
-        } else {
-            placeMove(x, y);
-            return true;
-        }
-    }
-
-    // only called when checkValidCoordinates determines legal move
-    // places user's move on board according to who's turn it is
-    //prints field as it stands following added move
-    // determines if move changed the state of the game
-    private static void placeMove(int x, int y){
-       
-            field.setCell(x, y, "X");
-       
-        // field.printField();
-        //setGameState();
-    }
-
-    //determines whether to place an X or an 0 based on
-    //who moved last
-    public static WhosTurn getWhosTurn(){
-       
-        if(whosTurn == WhosTurn.XTURN) {
-        	whosTurn = WhosTurn.YTURN;
-        } else {
-        	whosTurn = WhosTurn.XTURN;
-        }
-        return whosTurn;
-    }
-
+    
 
     public static void setGameState(){
         field.tallyCells();

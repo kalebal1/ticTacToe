@@ -24,5 +24,9 @@ abstract class Player {
 	public String getMarker() {
         return playerMarker.marker;
     }
+	
+	public void makeMove() {
+		
+	}
 
 }

@@ -1,10 +1,13 @@
 package ticTacToe;
 
+//this class holds the values for each cell on the field
+// includes methods used to determine if there's a winner or a draw
+
 public class Field {
-	String[][] field;
-	int numX;
-	int numO;
-	int numEmpty;
+	static String[][] field;
+	private int numX;
+	private int numO;
+	private int numEmpty;
 	
 	//sets up empty field for beginning of game
     public Field() {
@@ -32,6 +35,9 @@ public class Field {
     
     public int getOs() {
     	return numO;
+    }
+    public int getEmpty() {
+    	return 9 - (getXs() + getOs());
     }
     
     //displays state of current field
