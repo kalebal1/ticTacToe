@@ -18,9 +18,14 @@ public class Computer extends Player{
     	switch (this.difficulty) {
     	case "easy": 
     		makeEasyMove();
+    	case "medium":
+    		makeMediumMove();
+    	case "hard":
+    		makeHardMove();
 		default:
 			makeEasyMove();
     	}
+    	
     	
     }
 
@@ -47,6 +52,14 @@ public class Computer extends Player{
         }
 
         
+    }
+    
+    public void makeMediumMove() {
+    	makeEasyMove();
+    }
+    
+    public void makeHardMove() {
+    	makeEasyMove();
     }
     
 

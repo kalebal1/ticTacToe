@@ -104,12 +104,16 @@ public class Main {
     //verifies input is either "user" or "easy" then implements players as either User or Computer
     //player 1 is always X, 2 is always O
     private static void determinePlayers(String p1, String p2) {
+    	p1 = p1.toLowerCase();
+    	p2 = p2.toLowerCase();
     	
-    	if(!p1.equalsIgnoreCase("user") && !p1.equalsIgnoreCase("easy")) {
+    	if(!p1.equalsIgnoreCase("user") && !p1.equalsIgnoreCase("easy")
+    			&& !p1.equalsIgnoreCase("medium") && p1.equalsIgnoreCase("hard")) {
     		System.out.println("Bad parameters!" +  " in detPl");
     		System.out.println("p1 =" + p1);
     		menu();
-    	} else if (!p2.equalsIgnoreCase("user") && !p2.equalsIgnoreCase("easy")) {
+    	} else if (!p2.equalsIgnoreCase("user") && !p2.equalsIgnoreCase("easy")
+    			&& !p2.equalsIgnoreCase("medium") && !p2.equalsIgnoreCase("hard")) {
     		System.out.println("Bad parameters!" +  " in detPl");
     		System.out.println("p2 =" + p2);
     		menu();
