@@ -7,11 +7,8 @@ abstract class Player {
     	O("O");
 		
 		private String marker;
-		private String opponentMarker;
-		
         PlayerMarker(String marker){
             this.marker = marker;
-            this.opponentMarker = marker.equals("X") ? "O" : "X";
         }
     }
 	
@@ -27,10 +24,6 @@ abstract class Player {
 	public String getMarker() {
         return playerMarker.marker;
     }
-	
-	public String getOpponentMarker() {
-		return playerMarker.opponentMarker;
-	}
 	
 	public void makeMove() {
 		
