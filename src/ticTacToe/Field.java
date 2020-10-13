@@ -124,7 +124,31 @@ public class Field {
         return false;
     }
     
+    public String findWinner() {
+    	if(checkWins("X")) {
+    		return "X";
+    	} else if (checkWins("O")) {
+    		return "O";
+    	} else if (numEmpty == 0) {
+    		return "tie";
+    	}
+    	return null;
+    }
     
+    public String[] findEmptyCells() {
+    	String[] empty = new String[numEmpty];
+    	int i = 0;
+    	
+    	for(int row = 0; row < 3; row++) {
+    		for(int col = 0; col < 3; col++) {
+    			if(field[row][col].equals("_")) {
+    				empty[i] = row + "" + col;
+    				i++;
+    			}
+    		}
+    	}
+    	return null;
+    }
 
     
 }
